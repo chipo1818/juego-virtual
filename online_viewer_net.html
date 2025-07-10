@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Ruleta del Amor 💙💕</title>
+<style>
+  body {
+    background: linear-gradient(135deg, #cce7ff, #f9d6e3);
+    color: #003366;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    text-align: center;
+    padding: 40px 20px;
+  }
+  h1 {
+    margin-bottom: 20px;
+    font-size: 2.4rem;
+    color: #004a99;
+    text-shadow: 1px 1px 3px #f9a1b1;
+  }
+  #ruleta {
+    margin: 0 auto;
+    width: 320px;
+    height: 320px;
+    border: 12px solid #88bfff;
+    border-radius: 50%;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0 15px #a1c4fd;
+    background: #d0e7ff;
+  }
+  #flecha {
+    width: 0; 
+    height: 0; 
+    border-left: 20px solid transparent;
+    border-right: 20px solid transparent;
+    border-bottom: 40px solid #ff7396;
+    position: absolute;
+    top: -40px;
+    left: 50%;
+    margin-left: -20px;
+    z-index: 10;
+    filter: drop-shadow(0 0 3px #ff7396);
+  }
+  .segmento {
+    position: absolute;
+    width: 160px;
+    height: 160px;
+    top: 50%;
+    left: 50%;
+    margin-top: -160px;
+    margin-left: 0;
+    transform-origin: 100% 100%;
+    background-color: #74a3ff;
+    border: 2px solid #ff8fbf;
+    border-radius: 0 160px 0 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 8px 12px;
+    box-sizing: border-box;
+    color: #ffe6f0;
+    font-weight: 700;
+    font-size: 1rem;
+    text-align: center;
+    white-space: normal;
+    line-height: 1.3em;
+    text-shadow: 1px 1px 2px #74227f;
+  }
+  #botonGirar {
+    margin-top: 30px;
+    background: linear-gradient(135deg, #ff7396, #ff8fbf);
+    border: none;
+    padding: 15px 35px;
+    border-radius: 25px;
+    color: #fff;
+    font-size: 1.5rem;
+    font-weight: 900;
+    cursor: pointer;
+    box-shadow: 0 0 15px #ff7396;
+    transition: transform 0.2s ease;
+  }
+  #botonGirar:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 25px #ff7396;
+  }
+  #mensajeFinal {
+    margin-top: 35px;
+    font-size: 1.5rem;
+    font-weight: 900;
+    min-height: 90px;
+    color: #74227f;
+    text-shadow: 1px 1px 3px #ffc1d1;
+  }
+</style>
+</head>
+<body>
+
+<h1>Ruleta del Amor 💙💕</h1>
+<div id="ruleta">
+  <div id="flecha"></div>
+</div>
+<button id="botonGirar">Girar Ruleta</button>
+<div id="mensajeFinal"></div>
+
+<script>
+  const frases = [
+    "Veo en tus ojos, mi universo entero.",
+    "Por ti haría todo.",
+    "¿Es momento de recordarme que me amas?",
+    "Eres mi güerito precioso de ojitos lindos.",
+    "Contigo todo es mejor.",
+    "Tu sonrisa ilumina mi día.",
+    "Siempre a tu lado, colazón.",
+    "Eres mi alegría constante."
+  ];
+
+  const ruleta = document.getElementById('ruleta');
+  const botonGirar = document.getElementById('botonGirar');
+  const mensajeFinal = document.getElementById('mensajeFinal');
+  const numSegmentos = frases.length;
+  const gradosPorSegmento = 360 / numSegmentos;
+  let rotacionActual = 0;
+  let girando = false;
+
+  // Crear segmentos visuales
+  for(let i=0; i<numSegmentos; i++) {
+    const segmento = document.createElement('div');
+    segmento.className = 'segmento';
+    segmento.style.transform = `rotate(${i * gradosPorSegmento}deg) skewY(-${90 - gradosPorSegmento}deg)`;
+
+    const texto = document.createElement('div');
+    texto.style.transform = `skewY(${90 - gradosPorSegmento}deg) rotate(${gradosPorSegmento/2}deg)`;
+    texto.style.width = '100%';
+    texto.style.padding = '5px';
+    texto.style.boxSizing = 'border-box';
+    texto.textContent = frases[i];
+
+    segmento.appendChild(texto);
+    ruleta.appendChild(segmento);
+  }
+
+  botonGirar.addEventListener('click', () => {
+    if(girando) return;
+    girando = true;
+    mensajeFinal.textContent = '';
+    const audio = new Audio('https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg');
+    audio.play();
+    const giros = Math.floor(Math.random() * 4) + 5;
+    const anguloFinal = Math.floor(Math.random() * 360);
+    const totalRotacion = giros * 360 + anguloFinal;
+
+    const duracion = 4000;
+    const inicio = performance.now();
+
+    function animar(now) {
+      let tiempo = now - inicio;
+      if (tiempo > duracion) tiempo = duracion;
+      const progreso = 1 - Math.pow(1 - tiempo / duracion, 3);
+      ruleta.style.transform = `rotate(${rotacionActual + progreso * totalRotacion}deg)`;
+      if(tiempo < duracion) {
+        requestAnimationFrame(animar);
+      } else {
+        rotacionActual = (rotacionActual + totalRotacion) % 360;
+        mostrarFrase(anguloFinal);
+        girando = false;
+      }
+    }
+    requestAnimationFrame(animar);
+  });
+
+  function mostrarFrase(angulo) {
+    const index = Math.floor(((360 - angulo + gradosPorSegmento / 2) % 360) / gradosPorSegmento);
+    mensajeFinal.textContent = frases[index];
+  }
+</script>
+
+</body>
+</html>
